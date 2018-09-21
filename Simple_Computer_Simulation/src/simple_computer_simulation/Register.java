@@ -10,26 +10,26 @@ package simple_computer_simulation;
  */
 public class Register {
     //Properties
-    private Integer value;
+    private Integer val;
     
     //Default Constructor
     Register(){
-        value=0;
+        val = 0;
     }
     
     //Constructor
-    Register(Integer val){
-        value = val;
+    Register(Integer value){
+        val = value;
     }
     
     //Mutator
-    void changeVal(Integer val){
-        value = val;
+    void changeVal(Integer value){
+        val = value;
     }
     
     //Accessor
     Integer getVal(){
-        return value;
+        return val;
     }
     
 }

@@ -11,13 +11,13 @@ package simple_computer_simulation;
  */
 public class Adder {
     //Properties
-    Integer val1;
-    Integer val2;
+    private Integer val1;
+    private Integer val2;
     
     //Default Constructor
     Adder(){
-        val1 =0;
-        val2=0;
+        val1 = 0;
+        val2 = 0;
     }
     
     //Constructor
@@ -36,4 +36,21 @@ public class Adder {
         return val1+val2;
     }
     
+    //Accessors
+    Integer getVal1(){
+        return val1;
+    }
+    
+    Integer getVal2(){
+        return val2;
+    }
+    
+    //Mutators
+    void setVal1(Integer value){
+        val1=value;
+    }
+    
+    void setVal2(Integer value){
+        val2=value;
+    }
 }
