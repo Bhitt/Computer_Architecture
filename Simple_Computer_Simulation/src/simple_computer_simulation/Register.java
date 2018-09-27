@@ -23,7 +23,7 @@ public class Register {
     }
     
     //Mutator
-    void changeVal(Integer value){
+    void setVal(Integer value){
         val = value;
     }
     

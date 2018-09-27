@@ -15,7 +15,9 @@ public class Simple_Computer_Simulation {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        // instantiate the computer object and start it
+        ISA computer = new ISA();
+        
     }
     
 }
