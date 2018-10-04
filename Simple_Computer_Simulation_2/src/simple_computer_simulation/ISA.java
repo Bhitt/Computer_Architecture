@@ -20,6 +20,9 @@ public class ISA {
     private Reader reader;
     private Printer printer;
     private Bus bus;
+    private AddressLines addressLines;
+    private DataLines dataLines;
+    private ControlLines controlLines;
     
     //Default Constructor
     ISA(){
@@ -40,6 +43,9 @@ public class ISA {
         reader = new Reader();
         printer = new Printer();
         bus = new Bus();
+        addressLines = new AddressLines();
+        dataLines = new DataLines();
+        controlLines = new ControlLines();
     }
     
     //run method : simulates the program execution 
@@ -92,7 +98,7 @@ public class ISA {
         //throw read value onto bus
         bus.setVal(reader.getOutput());
         //throw bus value onto register zero
-        R0.setVal(bus.getVal());   
+        R0.setVal(bus.getVal());
     }
     
     //Print instruction
