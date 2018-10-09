@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+    Control Lines: used to send signals to coordinate
+    and manage the activities of the motherboard components
  */
 package simple_computer_simulation;
 

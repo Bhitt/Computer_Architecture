@@ -143,4 +143,14 @@ public class ISA {
         //add the values and store in regC
         regC.setVal(adder.add());
     }
+    
+    void LOAD(Register destination, Integer source){
+        
+    }
+    
+    void STORE(Register source, Integer destination){
+        
+    }
+    
+    
 }
