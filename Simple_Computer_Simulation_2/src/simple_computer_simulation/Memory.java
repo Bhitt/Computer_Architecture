@@ -1,5 +1,5 @@
 /*
-    Memory Control: 
+    Memory:
  */
 package simple_computer_simulation;
 
@@ -9,13 +9,13 @@ import java.util.BitSet;
  *
  * @author bhitt
  */
-public class MemoryControl {
+public class Memory {
     //Properties
-    private BitSet val;  //1024 word (2^10 bits)
+    private BitSet val;
     
-    //Default constructor
-    MemoryControl(){
-        //1024 word size register
+    //Default Constructor
+    Memory(){
+    //1024 word size register
         val = new BitSet(10);
     }
     

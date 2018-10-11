@@ -152,5 +152,12 @@ public class ISA {
         
     }
     
+    void DEC(Register reg){
+        //decrement a register value by one through adder
+        adder.setVal1(reg.getVal());
+        adder.setVal2(-1);
+        reg.setVal(adder.add());
+    }
+    
     
 }
