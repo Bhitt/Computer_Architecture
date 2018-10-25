@@ -10,9 +10,20 @@ package simple_computer_simulation;
  */
 public class DataLines {
     //Properties
+    private Integer val;
     
     //Default Constructor
     DataLines(){
-        
+        val=0;
+    }
+    
+    //Mutator
+    void set(Integer value){
+        val = value;
+    }
+    
+    //Accessor
+    Integer get(){
+        return val;
     }
 }

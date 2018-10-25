@@ -19,10 +19,14 @@ public class ISA {
     private Complementer complementer;
     private Reader reader;
     private Printer printer;
-    private Bus bus;
+    //private Bus bus;
     private AddressLines addressLines;
     private DataLines dataLines;
     private ControlLines controlLines;
+    private MemoryAddressRegister mAR;
+    private MemoryDataRegister mDR;
+    private Memory memory;
+    private MemoryControl memoryControl;
     
     //Default Constructor
     ISA(){
@@ -42,7 +46,7 @@ public class ISA {
         complementer = new Complementer();
         reader = new Reader();
         printer = new Printer();
-        bus = new Bus();
+        //bus = new Bus();
         addressLines = new AddressLines();
         dataLines = new DataLines();
         controlLines = new ControlLines();
@@ -96,16 +100,17 @@ public class ISA {
         //read in through reader
         reader.setBuffer();
         //throw read value onto bus
-        bus.setVal(reader.getOutput());
+        dataLines.set(reader.getOutput());
         //throw bus value onto register zero
-        R0.setVal(bus.getVal());
+        R0.setVal(dataLines.get());
     }
     
     //Print instruction
     //-prints(displays) the integer contained in R0
     void printInstruction(){
-        //Throw data on the bus
-        bus.setVal(R0.getVal());
+        //Throw data on the bus using its components
+            //bus.setVal(R0.getVal());
+        
         //grab data from the bus and throw it on the printer
         printer.setBuffer(bus.getVal());
         //print data from the printer
@@ -159,5 +164,21 @@ public class ISA {
         reg.setVal(adder.add());
     }
     
+    //Reading a word from memory
+    void readMemory(Integer address){
+        mAR.set(address);
+        addressLines.set(mAR.get());
+        controlLines.set(0); //signal for read
+        memoryControl.set(controlLines.get());
+        mDR.set(memory.get(addressLines.get()));
+    }
     
+    void storeMemory(Integer address, Integer value){
+        
+    }
+ 
+    //Memory Dump
+    void memoryDump(){
+        memory.memoryDump();
+    }
 }

@@ -6,7 +6,6 @@
  */
 package simple_computer_simulation;
 
-import java.util.BitSet;
 
 /**
  *
@@ -14,23 +13,20 @@ import java.util.BitSet;
  */
 public class MemoryDataRegister {
     //Properties
-    private BitSet val;
+    private Integer val;
     
     //Default Constructor
     MemoryDataRegister(){
-    //1024 word size register
-        val = new BitSet(10);
+        val=0;
     }
     
     //Mutator
-    void set(BitSet address){
-        for(int i=0;i<10;i++){
-            val.set(i, address.get(i));
-        }
+    void set(Integer value){
+        val = value;
     }
     
     //Accessor
-    BitSet get(){
+    Integer get(){
         return val;
     }
     

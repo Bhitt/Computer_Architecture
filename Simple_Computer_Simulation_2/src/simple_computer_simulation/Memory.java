@@ -3,7 +3,6 @@
  */
 package simple_computer_simulation;
 
-import java.util.BitSet;
 
 /**
  *
@@ -11,23 +10,34 @@ import java.util.BitSet;
  */
 public class Memory {
     //Properties
-    private BitSet val;
+    private Integer [] values;
     
     //Default Constructor
     Memory(){
     //1024 word size register
-        val = new BitSet(10);
-    }
-    
-    //Mutator
-    void set(BitSet address){
-        for(int i=0;i<10;i++){
-            val.set(i, address.get(i));
+        values = new Integer[1024];
+        for(int i=0;i<1024;i++){
+            values[i]=0;
         }
     }
     
+    //Mutator
+    void set(Integer address, Integer value){
+        values[address] = value;
+    }
+    
     //Accessor
-    BitSet get(){
-        return val;
+    Integer get(Integer address){
+        return values[address];
+    }
+    
+    
+    //Memory Dump
+    void memoryDump(){
+        for(int i=0;i<1024;i++){
+            if(values[i] != 0){
+                System.out.println("memDump Adress:"+i+" Content:"+values[i]);
+            }
+        }
     }
 }

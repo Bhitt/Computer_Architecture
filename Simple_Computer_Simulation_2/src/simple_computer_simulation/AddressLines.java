@@ -9,9 +9,20 @@ package simple_computer_simulation;
  */
 public class AddressLines {
     //Properties
+    private Integer val;
     
     //Default Constructor
     AddressLines(){
-        
+        val=0;
+    }
+    
+    //Mutator
+    void set(Integer value){
+        val = value;
+    }
+    
+    //Accessor
+    Integer get(){
+        return val;
     }
 }
