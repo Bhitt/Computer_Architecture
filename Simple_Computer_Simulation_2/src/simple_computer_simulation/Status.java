@@ -10,12 +10,23 @@ package simple_computer_simulation;
  */
 public class Status {
     //Properties
-   private short flag;
+   private boolean flag;
     
     //Default Constructor
     Status(){
-        flag = 0;
+        flag = false;
     }
+    
+    //Mutator
+    void set(boolean val){
+        flag = val;
+    }
+    
+    //return zero for false and one for true
+    boolean zero(){
+        return flag;
+    }
+    
     
     
 }

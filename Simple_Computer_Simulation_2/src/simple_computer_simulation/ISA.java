@@ -27,6 +27,7 @@ public class ISA {
     private MemoryDataRegister mDR;
     private Memory memory;
     private MemoryControl memoryControl;
+    private Status status;
     
     //Default Constructor
     ISA(){
@@ -50,46 +51,24 @@ public class ISA {
         addressLines = new AddressLines();
         dataLines = new DataLines();
         controlLines = new ControlLines();
+        status = new Status();
     }
     
     //run method : simulates the program execution 
     void run(){
-        //READ
-            readInstruction();
-        //MOVE R0, R1
-            moveInstruction(R0,R1);
-        //READ
-            readInstruction();
-        //MOVE R0,R2
-            moveInstruction(R0,R2);
-        //ADD R1,R2,R3
-            addInstruction(R1,R2,R3);
-        //MOVE R3,R0
-            moveInstruction(R3,R0);
-        //PRINT
-            printInstruction();
-        //READ
-            readInstruction();
-        //MOVE  R0, R1
-            moveInstruction(R0,R1);
-        //SUBTRACT R1,R3,R0
-            subInstruction(R1,R3,R0);
-        //PRINT
-            printInstruction();
-        //READ
-            readInstruction();
-        //MOVE R0,R2
-            moveInstruction(R0,R2);
-        //ADD R3,R2,R1
-            addInstruction(R3,R2,R1);
-        //MOVE R1,R0
-            moveInstruction(R1,R0);
-        //PRINT
-            printInstruction();
-        
+        //run the program
+        program();
         
        //final display information
        System.out.println("Branden Hitt " + LocalDateTime.now());
+    }
+    
+    //--------Program----------------//
+    void program(){
+        //Load R0 with immediate operand #42
+        LOAD(R0,42);
+        //Store R0 value into R1
+        STORE(R0,);
     }
     
     //--------INSTRUCTION SET--------//
@@ -150,7 +129,7 @@ public class ISA {
     }
     
     void LOAD(Register destination, Integer source){
-        
+        destination.setVal(source);
     }
     
     void STORE(Register source, Integer destination){
@@ -177,8 +156,19 @@ public class ISA {
         
     }
  
+    void loop(){
+        boolean looping =true;
+        while(looping){
+            if(!status.zero()){
+                continue;
+            }
+            looping=false;
+        }
+    }
+    
     //Memory Dump
     void memoryDump(){
         memory.memoryDump();
     }
+    
 }
