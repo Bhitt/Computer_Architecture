@@ -20,8 +20,9 @@ public class ControlLines {
     }
     
     //Mutator
-    void set(Integer value){
+    Integer set(Integer value){
         val = value;
+        return val;
     }
     
     //Accessor

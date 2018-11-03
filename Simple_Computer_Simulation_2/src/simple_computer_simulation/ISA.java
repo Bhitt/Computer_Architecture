@@ -67,8 +67,34 @@ public class ISA {
     void program(){
         //Load R0 with immediate operand #42
         LOAD(R0,42);
-        //Store R0 value into R1
-        STORE(R0,);
+        //Store R0 value into memory address 0
+        STORE(R0,0);
+        //Load R0 with immediate operand #30
+        LOAD(R0,30);
+        //Store R0 value into memory address
+        
+        //Load R0 with memory address 0 value
+        
+        //Print R0 value
+        
+        //Load R0 with memory address 1023
+        
+        //Print R0 value
+        
+        //Read 10 numbers from the keyboard and store them in memory (ListA)
+        
+        //Sum the 10 numbers (loop)
+        
+        //Store the sum in location 1001
+        
+        //Load the value at location 1001 into R0
+        
+        //Print R0 value
+        
+        //Copy the 10 numbers to another section and reverse the order (ListB)
+        
+        //Print the difference (ListB[i] - ListA[i])
+     
     }
     
     //--------INSTRUCTION SET--------//
@@ -91,7 +117,7 @@ public class ISA {
             //bus.setVal(R0.getVal());
         
         //grab data from the bus and throw it on the printer
-        printer.setBuffer(bus.getVal());
+            //printer.setBuffer(bus.getVal());
         //print data from the printer
         System.out.println(">> " + printer.getBuffer());
     }
@@ -107,40 +133,48 @@ public class ISA {
     //regC <-[regA] + [regB]
     void addInstruction(Register regA, Register regB, Register regC){
         System.err.println("\t\t\tADD " + regA + "," + regB + "," + regC); //for instruction trace
-        //throw register values on the adder
-        adder.setVal1(regA.getVal());
-        adder.setVal2(regB.getVal());
         //add the values and store in regC
-        regC.setVal(adder.add());
+        regC.setVal(adder.add(regA.getVal(),regB.getVal()));
     }
     
     //Sub instruction
     //regC <- [regB] - [regA]
     void subInstruction(Register regA, Register regB, Register regC){
         System.err.println("\t\t\tSUB " + regA + "," + regB + "," + regC);
-        //compliment registerA
-        complementer.setVal(regA.getVal());
-        complementer.complement();
-        //throw both values on the adder
-        adder.setVal1(regB.getVal());
-        adder.setVal2(complementer.getVal());
-        //add the values and store in regC
-        regC.setVal(adder.add());
+        // add regB and the complement of regA and store into regC
+        regC.setVal(adder.add(regB.getVal(),complementer.complement(regA.getVal())));
     }
     
     void LOAD(Register destination, Integer source){
-        destination.setVal(source);
+            //grab value at source address
+        //put address on MAR
+        mAR.set(source);
+        //pass address to address control line
+        addressLines.set(mAR.get());
+        //put a read signal on control line causing mem control to get the address
+        //  from the control lines
+        memoryControl.set(controlLines.set(0));
+        //retrieve the word, and put it in the MDR using data lines
+        dataLines.set(memory.get(addressLines.get()));
+        mDR.set(dataLines.get());
     }
     
     void STORE(Register source, Integer destination){
-        
+            //Grab source value and place it in memory at the destination address
+        //put value in the MDR
+        mDR.set(source.getVal());
+        //put address on control lines
+        addressLines.set(destination);
+        //put write signal on the control lines
+        //memory control gets the address from the control lines
+        memoryControl.set(controlLines.set(1));
+        //store the word from the MDR into memory
+        memory.set(addressLines.get(), mDR.get());
     }
     
     void DEC(Register reg){
         //decrement a register value by one through adder
-        adder.setVal1(reg.getVal());
-        adder.setVal2(-1);
-        reg.setVal(adder.add());
+        reg.setVal(adder.add(reg.getVal(),-1));
     }
     
     //Reading a word from memory
