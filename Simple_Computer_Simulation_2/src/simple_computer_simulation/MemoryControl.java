@@ -10,46 +10,21 @@ package simple_computer_simulation;
  */
 public class MemoryControl {
     //Properties
-    private MemoryAddressRegister mAR;
-    private MemoryDataRegister mDR;
     private Memory memory;
     
     //Default constructor
     MemoryControl(){
-        mAR = new MemoryAddressRegister();
-        mDR = new MemoryDataRegister();
         memory = new Memory();
     }
     
     //Mutators
-    void setMDR(Integer value){
-        mDR.set(value);
-    }
-    
-    void setMAR(Integer address){
-        mAR.set(address);
-    }
-    
-    void storeWord(Integer address, Integer value){
-        
+    void setMemory(Integer address, Integer value){
+        memory.set(address, value);
     }
     
     //Accessors
-    Integer getMDR(){
-        return mDR.get();
-    }
-    
-    Integer getMAR(){
-        return mAR.get();
-    }
-    
-    Integer readWord(Integer address){
-        mAR.set(address);
-        addressLines.set(mAR.get());
-        controlLines.set(0); //signal for read
-        memoryControl.set(controlLines.get());
-        mDR.set(memory.get(addressLines.get()));
-        return mDR.get();
+    Integer getMemory(Integer address){
+        return memory.get(address);
     }
     
     //Memory dump call

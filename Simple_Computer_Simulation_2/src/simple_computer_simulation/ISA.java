@@ -24,6 +24,8 @@ public class ISA {
     private DataLines dataLines;
     private ControlLines controlLines;
     private MemoryControl memoryControl;
+    private MemoryAddressRegister mAR;
+    private MemoryDataRegister mDR;
     private Status status;
     
     //Default Constructor
@@ -49,6 +51,8 @@ public class ISA {
         controlLines = new ControlLines();
         status = new Status();
         memoryControl = new MemoryControl();
+        mAR = new MemoryAddressRegister();
+        mDR = new MemoryDataRegister();
         status = new Status();
     }
     
@@ -92,7 +96,7 @@ public class ISA {
         //Copy the 10 numbers to another section and reverse the order (ListB)
         
         //Print the difference (ListB[i] - ListA[i])
-     
+        
     }
     
     //--------INSTRUCTION SET--------//
@@ -100,6 +104,7 @@ public class ISA {
     //Read instruction
     //-reads an integer from the keyboard and stores it in R0
     void readInstruction(){
+        //put read signal on the control lines
         controlLines.set(0);
         //read in through reader
         reader.setBuffer();
@@ -145,19 +150,19 @@ public class ISA {
         regC.setVal(adder.add(regB.getVal(),complementer.complement(regA.getVal())));
     }
     
-    void LOAD(Register destination, Integer source){
-            //grab value at source address
-        //put address on MAR
-        mAR.set(source);
-        //pass address to address control line
-        addressLines.set(mAR.get());
-        //put a read signal on control line causing mem control to get the address
-        //  from the control lines
-        memoryControl.set(controlLines.set(0));
-        //retrieve the word, and put it in the MDR using data lines
-        dataLines.set(memory.get(addressLines.get()));
-        mDR.set(dataLines.get());
-    }
+//    void LOAD(Register destination, Integer source){
+//            //grab value at source address
+//        //put address on MAR
+//        mAR.set(source);
+//        //pass address to address control line
+//        addressLines.set(mAR.get());
+//        //put a read signal on control line causing mem control to get the address
+//        //  from the control lines
+//        memoryControl.set(controlLines.set(0));
+//        //retrieve the word, and put it in the MDR using data lines
+//        dataLines.set(memory.get(addressLines.get()));
+//        mDR.set(dataLines.get());
+//    }
     
     void LOAD(Register destination, Integer source){
         System.err.println("\t\t\tLOAD " + destination + "," + source);  //for instruction trace
@@ -186,7 +191,18 @@ public class ISA {
     
     //Reading a word from memory
     Integer readMemory(Integer address){
-        
+        //put address on the MAR
+        mAR.set(address);
+        //mAR -> address lines
+        addressLines.set(mAR.get());
+        //set signal on control lines
+        controlLines.set(0);
+        //address lines -> memory control -> memory -> mDR
+        dataLines.set(memoryControl.getMemory(addressLines.get()));
+        //datalines -> mDR
+        mDR.set(dataLines.get());
+        //return data from mDR
+        return mDR.get();
     }
     
 //    void storeMemory(Integer address, Integer value){
