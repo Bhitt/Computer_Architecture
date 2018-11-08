@@ -1,5 +1,5 @@
 /*
-    Memory Control: 
+    Memory Control: controls the memory
  */
 package simple_computer_simulation;
 
@@ -10,20 +10,50 @@ package simple_computer_simulation;
  */
 public class MemoryControl {
     //Properties
-    private Integer val;
+    private MemoryAddressRegister mAR;
+    private MemoryDataRegister mDR;
+    private Memory memory;
     
     //Default constructor
     MemoryControl(){
-        val = 0;
+        mAR = new MemoryAddressRegister();
+        mDR = new MemoryDataRegister();
+        memory = new Memory();
     }
     
-    //Mutator
-    void set(Integer value){
-        val = value;
+    //Mutators
+    void setMDR(Integer value){
+        mDR.set(value);
     }
     
-    //Accessor
-    Integer get(){
-        return val;
+    void setMAR(Integer address){
+        mAR.set(address);
+    }
+    
+    void storeWord(Integer address, Integer value){
+        
+    }
+    
+    //Accessors
+    Integer getMDR(){
+        return mDR.get();
+    }
+    
+    Integer getMAR(){
+        return mAR.get();
+    }
+    
+    Integer readWord(Integer address){
+        mAR.set(address);
+        addressLines.set(mAR.get());
+        controlLines.set(0); //signal for read
+        memoryControl.set(controlLines.get());
+        mDR.set(memory.get(addressLines.get()));
+        return mDR.get();
+    }
+    
+    //Memory dump call
+    void memoryDump(){
+        memory.memoryDump();
     }
 }

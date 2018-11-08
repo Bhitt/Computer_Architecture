@@ -21,6 +21,7 @@ public class ControlLines {
     
     //Mutator
     Integer set(Integer value){
+        //set the signal to read or write
         val = value;
         return val;
     }
@@ -29,4 +30,5 @@ public class ControlLines {
     Integer get(){
         return val;
     }
+
 }
