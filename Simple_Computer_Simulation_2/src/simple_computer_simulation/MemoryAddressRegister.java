@@ -20,7 +20,7 @@ public class MemoryAddressRegister {
     
     //Mutator
     void set(Integer value){
-        value = val;
+        val=value;
     }
     
     //Accessor

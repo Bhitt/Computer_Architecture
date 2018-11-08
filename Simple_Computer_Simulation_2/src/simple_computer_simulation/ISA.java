@@ -52,6 +52,11 @@ public class ISA {
         dataLines = new DataLines();
         controlLines = new ControlLines();
         status = new Status();
+        mAR = new MemoryAddressRegister();
+        mDR = new MemoryDataRegister();
+        memory = new Memory();
+        memoryControl = new MemoryControl();
+        status = new Status();
     }
     
     //run method : simulates the program execution 
@@ -71,16 +76,16 @@ public class ISA {
         STORE(R0,0);
         //Load R0 with immediate operand #30
         LOAD(R0,30);
-        //Store R0 value into memory address
-        
+        //Store R0 value into memory address 1023
+        STORE(R0,1023);
         //Load R0 with memory address 0 value
-        
+        LOAD(R0,readMemory(0));
         //Print R0 value
-        
+        printInstruction();
         //Load R0 with memory address 1023
-        
+        LOAD(R0,readMemory(1023));
         //Print R0 value
-        
+        printInstruction();
         //Read 10 numbers from the keyboard and store them in memory (ListA)
         
         //Sum the 10 numbers (loop)
@@ -113,11 +118,12 @@ public class ISA {
     //Print instruction
     //-prints(displays) the integer contained in R0
     void printInstruction(){
+        System.err.println("\t\t\tprintInstruction " + R0);  //for instruction trace
         //Throw data on the bus using its components
-            //bus.setVal(R0.getVal());
+            mDR.set(R0.getVal());
         
         //grab data from the bus and throw it on the printer
-            //printer.setBuffer(bus.getVal());
+            printer.setBuffer(mDR.get());
         //print data from the printer
         System.out.println(">> " + printer.getBuffer());
     }
@@ -145,21 +151,28 @@ public class ISA {
         regC.setVal(adder.add(regB.getVal(),complementer.complement(regA.getVal())));
     }
     
+//    void LOAD(Register destination, Integer source){
+//            //grab value at source address
+//        //put address on MAR
+//        mAR.set(source);
+//        //pass address to address control line
+//        addressLines.set(mAR.get());
+//        //put a read signal on control line causing mem control to get the address
+//        //  from the control lines
+//        memoryControl.set(controlLines.set(0));
+//        //retrieve the word, and put it in the MDR using data lines
+//        dataLines.set(memory.get(addressLines.get()));
+//        mDR.set(dataLines.get());
+//    }
+    
     void LOAD(Register destination, Integer source){
-            //grab value at source address
-        //put address on MAR
-        mAR.set(source);
-        //pass address to address control line
-        addressLines.set(mAR.get());
-        //put a read signal on control line causing mem control to get the address
-        //  from the control lines
-        memoryControl.set(controlLines.set(0));
-        //retrieve the word, and put it in the MDR using data lines
-        dataLines.set(memory.get(addressLines.get()));
-        mDR.set(dataLines.get());
+        System.err.println("\t\t\tLOAD " + destination + "," + source);  //for instruction trace
+            //store source into destination
+        destination.setVal(source);
     }
     
     void STORE(Register source, Integer destination){
+        System.err.println("\t\t\tSTORE " + source + "," + destination);  //for instruction trace
             //Grab source value and place it in memory at the destination address
         //put value in the MDR
         mDR.set(source.getVal());
@@ -178,12 +191,13 @@ public class ISA {
     }
     
     //Reading a word from memory
-    void readMemory(Integer address){
+    Integer readMemory(Integer address){
         mAR.set(address);
         addressLines.set(mAR.get());
         controlLines.set(0); //signal for read
         memoryControl.set(controlLines.get());
         mDR.set(memory.get(addressLines.get()));
+        return mDR.get();
     }
     
     void storeMemory(Integer address, Integer value){
@@ -192,9 +206,10 @@ public class ISA {
  
     void loop(){
         boolean looping =true;
+        looptop:
         while(looping){
             if(!status.zero()){
-                continue;
+                continue looptop;
             }
             looping=false;
         }
