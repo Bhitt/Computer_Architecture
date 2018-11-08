@@ -67,14 +67,14 @@ public class ISA {
     
     //--------Program----------------//
     void program(){
-        //Load R0 with immediate operand #42
-        LOAD(R0,42);
-        //Store R0 value into memory address 0
-        STORE(R0,0);
-        //Load R0 with immediate operand #30
-        LOAD(R0,30);
-        //Store R0 value into memory address 1023
-        STORE(R0,1023);
+        //Load R3 with immediate operand #42
+        LOAD(R3,42);
+        //Store R3 value into memory address 0
+        STORE(R3,0);
+        //Load R2 with immediate operand #30
+        LOAD(R2,30);
+        //Store R2 value into memory address 1023
+        STORE(R2,1023);
         //Load R0 with memory address 0 value
         LOAD(R0,readMemory(0));
         //Print R0 value
@@ -84,19 +84,30 @@ public class ISA {
         //Print R0 value
         printInstruction();
         //Read 10 numbers from the keyboard and store them in memory (ListA)
-        
+        for(int i=0;i<10;i++){
+            readInstruction();
+            storeMemory(50+i,R0.getVal());
+        }
         //Sum the 10 numbers (loop)
-        
+        for(int i=0;i<10;i++){
+            storeMemory(1001,adder.add(readMemory(1001), readMemory(50+i)));
+        }
         //Store the sum in location 1001
         
         //Load the value at location 1001 into R0
-        
+        LOAD(R0,readMemory(1001));
         //Print R0 value
-        
+        printInstruction();
         //Copy the 10 numbers to another section and reverse the order (ListB)
-        
+        for(int i=0;i<10;i++){
+            storeMemory((79-i),readMemory(50+i));
+        }
         //Print the difference (ListB[i] - ListA[i])
-        
+        for(int i=0;i<10;i++){
+            //System.out.println("val1:"+readMemory(71+i)+" val2:"+readMemory(50+i));
+            LOAD(R0,adder.add(readMemory(70+i),complementer.complement(readMemory(50+i))));
+            printInstruction();
+        }
     }
     
     //--------INSTRUCTION SET--------//
@@ -117,7 +128,7 @@ public class ISA {
     //Print instruction
     //-prints(displays) the integer contained in R0
     void printInstruction(){
-        System.err.println("\t\t\tprintInstruction " + R0);  //for instruction trace
+        //System.err.println("\t\t\tprintInstruction " + R0);  //for instruction trace
         //Throw data on the bus using its components
             mDR.set(R0.getVal());
         
@@ -130,14 +141,14 @@ public class ISA {
     //Move instruction
     //regB <- [regA]
     void moveInstruction(Register regA, Register regB){
-        System.err.println("\t\t\tMOVE " + regA + "," + regB);  //for instruction trace
+        //System.err.println("\t\t\tMOVE " + regA + "," + regB);  //for instruction trace
         regB.setVal(regA.getVal());
     }
     
     //Add instruction
     //regC <-[regA] + [regB]
     void addInstruction(Register regA, Register regB, Register regC){
-        System.err.println("\t\t\tADD " + regA + "," + regB + "," + regC); //for instruction trace
+        //System.err.println("\t\t\tADD " + regA + "," + regB + "," + regC); //for instruction trace
         //add the values and store in regC
         regC.setVal(adder.add(regA.getVal(),regB.getVal()));
     }
@@ -145,7 +156,7 @@ public class ISA {
     //Sub instruction
     //regC <- [regB] - [regA]
     void subInstruction(Register regA, Register regB, Register regC){
-        System.err.println("\t\t\tSUB " + regA + "," + regB + "," + regC);
+        //System.err.println("\t\t\tSUB " + regA + "," + regB + "," + regC);
         // add regB and the complement of regA and store into regC
         regC.setVal(adder.add(regB.getVal(),complementer.complement(regA.getVal())));
     }
@@ -165,23 +176,15 @@ public class ISA {
 //    }
     
     void LOAD(Register destination, Integer source){
-        System.err.println("\t\t\tLOAD " + destination + "," + source);  //for instruction trace
+        //System.err.println("\t\t\tLOAD " + destination + "," + source);  //for instruction trace
             //store source into destination
         destination.setVal(source);
     }
     
     void STORE(Register source, Integer destination){
-        System.err.println("\t\t\tSTORE " + source + "," + destination);  //for instruction trace
-            //Grab source value and place it in memory at the destination address
-        //put value in the MDR
-        mDR.set(source.getVal());
-        //put address on control lines
-        addressLines.set(destination);
-        //put write signal on the control lines
-        //memory control gets the address from the control lines
-        memoryControl.set(controlLines.set(1));
-        //store the word from the MDR into memory
-        memory.set(addressLines.get(), mDR.get());
+        //System.err.println("\t\t\tSTORE " + source + "," + destination);  //for instruction trace
+        //Grab source value and place it in memory at the destination address
+        storeMemory(destination,source.getVal());
     }
     
     void DEC(Register reg){
@@ -205,20 +208,31 @@ public class ISA {
         return mDR.get();
     }
     
-//    void storeMemory(Integer address, Integer value){
-//        
-//    }
- 
-    void loop(){
-        boolean looping =true;
-        looptop:
-        while(looping){
-            if(!status.zero()){
-                continue looptop;
-            }
-            looping=false;
-        }
+    void storeMemory(Integer address, Integer value){
+        //put value on the MDR
+        mDR.set(value);
+        //send data to the data lines from the MDR
+        dataLines.set(mDR.get());
+        //put address on the MAR
+        mAR.set(address);
+        //send address to the address lines from the MAR
+        addressLines.set(mAR.get());
+        //set signal on the control lines
+        controlLines.set(1);
+        //use memory control to store the data in memory and the address
+        memoryControl.setMemory(addressLines.get(), dataLines.get());
     }
+ 
+//    void loop(){
+//        boolean looping =true;
+//        looptop:
+//        while(looping){
+//            if(!status.zero()){
+//                continue looptop;
+//            }
+//            looping=false;
+//        }
+//    }
     
     //Memory Dump
     void memoryDump(){
