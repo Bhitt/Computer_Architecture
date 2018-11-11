@@ -36,7 +36,7 @@ public class Memory {
     void memoryDump(){
         for(int i=0;i<1024;i++){
             if(values[i] != 0){
-                System.out.println("memDump Adress:"+i+" Content:"+values[i]);
+                System.out.println("Memory Dump Address:"+i+" | Content:"+values[i]);
             }
         }
     }

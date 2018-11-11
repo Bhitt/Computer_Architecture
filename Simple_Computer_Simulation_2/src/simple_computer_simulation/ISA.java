@@ -19,7 +19,6 @@ public class ISA {
     private Complementer complementer;
     private Printer printer;
     private Reader reader;
-    //private Bus bus;
     private AddressLines addressLines;
     private DataLines dataLines;
     private ControlLines controlLines;
@@ -61,6 +60,9 @@ public class ISA {
         //run the program
         program();
         
+        //call a memory dump to end program
+        memoryControl.memoryDump();
+        
        //final display information
        System.out.println("Branden Hitt " + LocalDateTime.now());
     }
@@ -90,9 +92,9 @@ public class ISA {
         }
         //Sum the 10 numbers (loop)
         for(int i=0;i<10;i++){
+            //Store the sum in location 1001
             storeMemory(1001,adder.add(readMemory(1001), readMemory(50+i)));
         }
-        //Store the sum in location 1001
         
         //Load the value at location 1001 into R0
         LOAD(R0,readMemory(1001));
@@ -108,6 +110,7 @@ public class ISA {
             LOAD(R0,adder.add(readMemory(70+i),complementer.complement(readMemory(50+i))));
             printInstruction();
         }
+
     }
     
     //--------INSTRUCTION SET--------//
@@ -128,12 +131,13 @@ public class ISA {
     //Print instruction
     //-prints(displays) the integer contained in R0
     void printInstruction(){
-        //System.err.println("\t\t\tprintInstruction " + R0);  //for instruction trace
+            //System.err.println("\t\t\tprintInstruction " + R0);  //for instruction trace
+        //put write signal on control lines object
+        controlLines.set(1);
         //Throw data on the bus using its components
-            mDR.set(R0.getVal());
-        
+        dataLines.set(R0.getVal());
         //grab data from the bus and throw it on the printer
-            printer.setBuffer(mDR.get());
+        printer.setBuffer(dataLines.get());
         //print data from the printer
         System.out.println(">> " + printer.getBuffer());
     }
@@ -141,14 +145,14 @@ public class ISA {
     //Move instruction
     //regB <- [regA]
     void moveInstruction(Register regA, Register regB){
-        //System.err.println("\t\t\tMOVE " + regA + "," + regB);  //for instruction trace
+            //System.err.println("\t\t\tMOVE " + regA + "," + regB);  //for instruction trace
         regB.setVal(regA.getVal());
     }
     
     //Add instruction
     //regC <-[regA] + [regB]
     void addInstruction(Register regA, Register regB, Register regC){
-        //System.err.println("\t\t\tADD " + regA + "," + regB + "," + regC); //for instruction trace
+            //System.err.println("\t\t\tADD " + regA + "," + regB + "," + regC); //for instruction trace
         //add the values and store in regC
         regC.setVal(adder.add(regA.getVal(),regB.getVal()));
     }
@@ -161,28 +165,15 @@ public class ISA {
         regC.setVal(adder.add(regB.getVal(),complementer.complement(regA.getVal())));
     }
     
-//    void LOAD(Register destination, Integer source){
-//            //grab value at source address
-//        //put address on MAR
-//        mAR.set(source);
-//        //pass address to address control line
-//        addressLines.set(mAR.get());
-//        //put a read signal on control line causing mem control to get the address
-//        //  from the control lines
-//        memoryControl.set(controlLines.set(0));
-//        //retrieve the word, and put it in the MDR using data lines
-//        dataLines.set(memory.get(addressLines.get()));
-//        mDR.set(dataLines.get());
-//    }
     
     void LOAD(Register destination, Integer source){
-        //System.err.println("\t\t\tLOAD " + destination + "," + source);  //for instruction trace
-            //store source into destination
+            //System.err.println("\t\t\tLOAD " + destination + "," + source);  //for instruction trace
+        //store source into destination
         destination.setVal(source);
     }
     
     void STORE(Register source, Integer destination){
-        //System.err.println("\t\t\tSTORE " + source + "," + destination);  //for instruction trace
+            //System.err.println("\t\t\tSTORE " + source + "," + destination);  //for instruction trace
         //Grab source value and place it in memory at the destination address
         storeMemory(destination,source.getVal());
     }
@@ -208,6 +199,7 @@ public class ISA {
         return mDR.get();
     }
     
+    //Store a word in memory at address
     void storeMemory(Integer address, Integer value){
         //put value on the MDR
         mDR.set(value);
@@ -223,16 +215,16 @@ public class ISA {
         memoryControl.setMemory(addressLines.get(), dataLines.get());
     }
  
-//    void loop(){
-//        boolean looping =true;
-//        looptop:
-//        while(looping){
-//            if(!status.zero()){
-//                continue looptop;
-//            }
-//            looping=false;
-//        }
-//    }
+    void loop(){
+        boolean looping =true;
+        looptop:
+        while(looping){
+            if(!status.zero()){
+                continue looptop;
+            }
+            looping=false;
+        }
+    }
     
     //Memory Dump
     void memoryDump(){
