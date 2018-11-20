@@ -4,6 +4,7 @@
 package simple_computer_simulation;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  *
@@ -26,6 +27,8 @@ public class ISA {
     private MemoryAddressRegister mAR;
     private MemoryDataRegister mDR;
     private Status status;
+    private ProgramCounter programCounter;
+    private InstructionRegister instructionRegister;
     
     //Default Constructor
     ISA(){
@@ -52,8 +55,21 @@ public class ISA {
         mAR = new MemoryAddressRegister();
         mDR = new MemoryDataRegister();
         status = new Status();
+        programCounter = new ProgramCounter();
+        instructionRegister = new InstructionRegister();
         //set status running to true
         status.setRunning(true);
+    }
+    
+    //load program memory
+    void loadProg(Integer fW, Integer fI, List<Integer> instructions){
+        //set the program counter to the first instruction address
+        programCounter.setCounter(fI);
+        //load program into memory starting at the first word
+        for(Integer number: instructions){
+            memoryControl.setMemory(fW, number);
+            fW++;
+        }
     }
     
     //run method : simulates the program execution 
@@ -70,26 +86,211 @@ public class ISA {
     
     void fetch(){
         //get an address from the PC
-        
-        //obatin the instruction from memory
-        
+        //obtain the instruction from memory
         //deliver the instruction to the instruction register
+        instructionRegister.setVal(memoryControl.getMemory(programCounter.getCounter()));
+        //trace stuff
+        System.out.println("Starting Location: "+programCounter.getCounter()+"   OPCode:"+instructionRegister.getVal());
     }
     
     void adjustPC(){
         //change the program counter to its new value
-        
+        programCounter.setCounter(programCounter.getCounter()+1);
     }
     
     void execute(){
+        //variables
+        Integer op1,op2,op3;
         //get the instruction from the the instruction register
-        
+        Integer code = instructionRegister.getVal();
+//        System.out.println("---------------");
+//        System.out.println("code:"+code);
+//        System.out.println("program counter:"+programCounter.getCounter());
         //decode the instruction
-        
-        //if the instruction is invalid, dump memory and halt
-        
-        //else
         //call the appropriate method to carry out the instruction
+        if(code==110){
+            //get three operands
+            op1 = memoryControl.getMemory(programCounter.getCounter());
+            op2 = memoryControl.getMemory(programCounter.getCounter()+1);
+            op3 = memoryControl.getMemory(programCounter.getCounter()+2);
+            //increment program counter
+            programCounter.setCounter(programCounter.getCounter()+3);
+            //call correct version of add
+            ADD(op1,op2,op3);
+        }else if(code==120){
+            //get three operands
+            op1 = memoryControl.getMemory(programCounter.getCounter());
+            op2 = memoryControl.getMemory(programCounter.getCounter()+1);
+            op3 = memoryControl.getMemory(programCounter.getCounter()+2);
+            //increment program counter
+            programCounter.setCounter(programCounter.getCounter()+3);
+            //call subInstruction
+            SUB(op1,op2,op3);
+        }else if(code==160){
+            //get operand
+            op1 = memoryControl.getMemory(programCounter.getCounter());
+            //increment program counter
+            programCounter.setCounter(programCounter.getCounter()+1);
+            //call Dec
+            if(op1==0){
+                DEC(R0);
+            }else if(op1==1){
+                DEC(R1);
+            }else if(op1==2){
+                DEC(R2);
+            }else if(op1==3){
+                DEC(R3);
+            }else{
+                HALT();
+            }
+        }else if(code==440){
+            //get operand
+            op1 = memoryControl.getMemory(programCounter.getCounter());
+            //increment program counter 
+            programCounter.setCounter(programCounter.getCounter()+1);
+            //call BRNZ
+            BRNZ(op1);
+        }else if(code==810){
+            //call READ
+            readInstruction();
+        }else if(code==820){
+            //call Print
+            printInstruction();
+        }else if(code==000){
+           //call NOOP
+           NOOP();
+        }else if(code==999){
+            //call HALT
+            HALT();
+        }else if(code==510){
+            //get two operands
+            op1 = memoryControl.getMemory(programCounter.getCounter());
+            op2 = memoryControl.getMemory(programCounter.getCounter()+1);
+            //increment program counter
+            programCounter.setCounter(programCounter.getCounter()+2);
+            //call MOVE
+            MOVE(op1,op2);
+        }else if(code==610){
+            //get two operands
+            op1 = memoryControl.getMemory(programCounter.getCounter());
+            op2 = memoryControl.getMemory(programCounter.getCounter()+1);
+            //Load Absolute - use address parameter with no modifications
+            //increment program counter
+            programCounter.setCounter(programCounter.getCounter()+2);
+            //call load for correct register
+            if(op1==0) LOAD(R0,readMemory(op2));
+            else if(op1==1) LOAD(R1,readMemory(op2));
+            else if(op1==2) LOAD(R2,readMemory(op2));
+            else if(op1==3) LOAD(R3,readMemory(op2));
+            else HALT();
+        }else if(code==620){
+            //get two operands
+            op1 = memoryControl.getMemory(programCounter.getCounter());
+            op2 = memoryControl.getMemory(programCounter.getCounter()+1);
+            //increment program counter
+            programCounter.setCounter(programCounter.getCounter()+2);
+            //LOAD register indirect - get value from register
+            Integer temp = 0;
+            if(op2==0) temp = R0.getVal();
+            else if(op2==1) temp = R1.getVal();
+            else if(op2==2) temp = R2.getVal();
+            else if(op2==3) temp = R3.getVal();
+            else HALT();
+            //choose correct destination
+            //call load for correct register
+            if(op1==0) LOAD(R0,temp);
+            else if(op1==1) LOAD(R1,temp);
+            else if(op1==2) LOAD(R2,temp);
+            else if(op1==3) LOAD(R3,temp);
+            else HALT();
+        }else if(code==630){
+            //get two operands
+            op1 = memoryControl.getMemory(programCounter.getCounter());
+            op2 = memoryControl.getMemory(programCounter.getCounter()+1);
+            //increment program counter
+            programCounter.setCounter(programCounter.getCounter()+2);
+            //LOAD auto increment register indirect - get value from register and increment
+            Integer temp = 0;
+            if(op2==0) temp = R0.getVal()+1;
+            else if(op2==1) temp = R1.getVal()+1;
+            else if(op2==2) temp = R2.getVal()+1;
+            else if(op2==3) temp = R3.getVal()+1;
+            else HALT();
+            //choose correct destination
+            //call load for correct register
+            if(op1==0) LOAD(R0,temp);
+            else if(op1==1) LOAD(R1,temp);
+            else if(op1==2) LOAD(R2,temp);
+            else if(op1==3) LOAD(R3,temp);
+            else HALT();
+        }else if(code==640){
+            //get two operands
+            op1 = memoryControl.getMemory(programCounter.getCounter());
+            op2 = memoryControl.getMemory(programCounter.getCounter()+1);
+            //increment program counter
+            programCounter.setCounter(programCounter.getCounter()+2);
+            //Load immediate
+            //call load for correct register
+            if(op1==0) LOAD(R0,op2);
+            else if(op1==1) LOAD(R1,op2);
+            else if(op1==2) LOAD(R2,op2);
+            else if(op1==3) LOAD(R3,op2);
+            else HALT();
+        }else if(code==710){
+            //get two operands
+            op1 = memoryControl.getMemory(programCounter.getCounter());
+            op2 = memoryControl.getMemory(programCounter.getCounter()+1);
+            //increment program counter
+            programCounter.setCounter(programCounter.getCounter()+2);
+            //call Store on correct reg
+            if(op1==0) STORE(R0,op2);
+            else if(op1==1) STORE(R1,op2);
+            else if(op1==2) STORE(R2,op2);
+            else if(op1==3) STORE(R3,op2);
+            else HALT();
+        }else if(code==720){
+            //get two operands
+            op1 = memoryControl.getMemory(programCounter.getCounter());
+            op2 = memoryControl.getMemory(programCounter.getCounter()+1);
+            //increment program counter
+            programCounter.setCounter(programCounter.getCounter()+2);
+            //get the correct address
+            Integer add=0;
+            if(op2==0) add=R0.getVal();
+            else if(op2==1) add=R1.getVal();
+            else if(op2==2) add=R2.getVal();
+            else if(op2==3) add=R3.getVal();
+            else HALT();
+            //Store the source at the address
+            if(op1==0) STORE(R0,add);
+            else if(op1==1) STORE(R1,add);
+            else if(op1==2) STORE(R2,add);
+            else if(op1==3) STORE(R3,add);
+            else HALT();
+        }else if(code==730){
+            //get two operands
+            op1 = memoryControl.getMemory(programCounter.getCounter());
+            op2 = memoryControl.getMemory(programCounter.getCounter()+1);
+            //increment program counter
+            programCounter.setCounter(programCounter.getCounter()+2);
+            //get the correct address
+            Integer add=0;
+            if(op2==0) add=R0.getVal()+1;
+            else if(op2==1) add=R1.getVal()+1;
+            else if(op2==2) add=R2.getVal()+1;
+            else if(op2==3) add=R3.getVal()+1;
+            else HALT();
+            //Store the source at the address
+            if(op1==0) STORE(R0,add);
+            else if(op1==1) STORE(R1,add);
+            else if(op1==2) STORE(R2,add);
+            else if(op1==3) STORE(R3,add);
+            else HALT();
+        }else{
+            //if the instruction is invalid, dump memory and halt   
+            HALT();
+        }
+
     }
     
     //--------INSTRUCTION SET--------//
@@ -127,6 +328,22 @@ public class ISA {
             //System.err.println("\t\t\tMOVE " + regA + "," + regB);  //for instruction trace
         regB.setVal(regA.getVal());
     }
+    void MOVE(Integer regA, Integer regB){
+        //get values
+        Integer temp1 =0;
+        //regA value
+        if(regA==0) temp1 = R0.getVal();
+        else if(regA==1) temp1 = R1.getVal();
+        else if(regA==2) temp1 = R2.getVal();
+        else if(regA==3) temp1 = R3.getVal();
+        else HALT();
+        //store in regB
+        if(regB==0) R0.setVal(temp1);
+        else if(regB==1) R1.setVal(temp1);
+        else if(regB==2) R2.setVal(temp1);
+        else if(regB==3) R3.setVal(temp1);
+        else HALT();
+    }
     
     //Add instruction
     //regC <-[regA] + [regB]
@@ -134,6 +351,29 @@ public class ISA {
             //System.err.println("\t\t\tADD " + regA + "," + regB + "," + regC); //for instruction trace
         //add the values and store in regC
         regC.setVal(adder.add(regA.getVal(),regB.getVal()));
+    }
+    
+    void ADD(Integer regA, Integer regB, Integer regC){
+        //get values
+        Integer temp1 =0, temp2=0;
+        //regA value
+        if(regA==0) temp1 = R0.getVal();
+        else if(regA==1) temp1 = R1.getVal();
+        else if(regA==2) temp1 = R2.getVal();
+        else if(regA==3) temp1 = R3.getVal();
+        else HALT();
+        //regB value
+        if(regB==0) temp2 = R0.getVal();
+        else if(regB==1) temp2 = R1.getVal();
+        else if(regB==2) temp2 = R2.getVal();
+        else if(regB==3) temp2 = R3.getVal();
+        else HALT();
+        //store in regC
+        if(regC==0) R0.setVal(adder.add(temp1, temp2));
+        else if(regC==1) R1.setVal(adder.add(temp1, temp2));
+        else if(regC==2) R2.setVal(adder.add(temp1, temp2));
+        else if(regC==3) R3.setVal(adder.add(temp1, temp2));
+        else HALT();
     }
     
     //Sub instruction
@@ -144,6 +384,28 @@ public class ISA {
         regC.setVal(adder.add(regB.getVal(),complementer.complement(regA.getVal())));
     }
     
+    void SUB(Integer regA, Integer regB, Integer regC){
+        //get values
+        Integer temp1 =0, temp2=0;
+        //regA value
+        if(regA==0) temp1 = R0.getVal();
+        else if(regA==1) temp1 = R1.getVal();
+        else if(regA==2) temp1 = R2.getVal();
+        else if(regA==3) temp1 = R3.getVal();
+        else HALT();
+        //regB value
+        if(regB==0) temp2 = R0.getVal();
+        else if(regB==1) temp2 = R1.getVal();
+        else if(regB==2) temp2 = R2.getVal();
+        else if(regB==3) temp2 = R3.getVal();
+        else HALT();
+        //store in regC
+        if(regC==0) R0.setVal(adder.add(complementer.complement(temp1), temp2));
+        else if(regC==1) R1.setVal(adder.add(complementer.complement(temp1), temp2));
+        else if(regC==2) R2.setVal(adder.add(complementer.complement(temp1), temp2));
+        else if(regC==3) R3.setVal(adder.add(complementer.complement(temp1), temp2));
+        else HALT();
+    }
     //LOAD instruction
     //loads a value into the register
     void LOAD(Register destination, Integer source){
@@ -151,6 +413,8 @@ public class ISA {
         //store source into destination
         destination.setVal(source);
     }
+    
+    
     
     //STORE instruction
     //stores the value from a register into memory location
@@ -202,6 +466,8 @@ public class ISA {
     //HALT instruction
     //signals end of execution
     void HALT(){
+        System.out.println("HALT() -> Program will terminate.");
+        memoryDump();
         status.setRunning(false);
     }
     
@@ -213,24 +479,12 @@ public class ISA {
     
     //BRNZ instruction
     //branch to an absolute address
-    void BRNZ(){
-        
-    }
- 
-    void loop(){
-        boolean looping =true;
-        looptop:
-        while(looping){
-            if(!status.getFlag()){
-                continue looptop;
-            }
-            looping=false;
-        }
+    void BRNZ(Integer address){
+        programCounter.setCounter(address);
     }
     
     //Memory Dump
     void memoryDump(){
         memoryControl.memoryDump();
     }
-    
 }

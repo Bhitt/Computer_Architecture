@@ -16,7 +16,8 @@ public class Simple_Computer_Simulation {
         // instantiate the computer object and build it
         ISA computer = new ISA();
         // load the program
-        
+        ProgramLoader programLoader = new ProgramLoader();
+        computer.loadProg(programLoader.getFW(), programLoader.getFI(), programLoader.getInstruction());
         //run the ISA
         computer.run();
         

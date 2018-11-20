@@ -1,0 +1,19 @@
+Program Trivial Example
+400
+403
+29                      //Data
+505                     //Data
+211                     //Data
+810                     //READ
+510      0     1        //MOVE R0, R1
+810                     //READ
+510      0     2        //MOVE R0, R2
+110      1     2     3  //ADD R1, R2, R3
+510      3     0        //MOVE R3, R0
+820                     //PRINT
+640      3   732        //LOAD  R4, #732
+710      3   909        //STORE  R4, 909
+610      0   909        //LOAD  R3, 909
+160      0              //DEC  R3
+820                     //PRINT
+999                     //HALT

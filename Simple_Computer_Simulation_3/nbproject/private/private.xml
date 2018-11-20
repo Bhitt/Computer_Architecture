@@ -2,13 +2,6 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group>
-            <file>file:/C:/Users/bhitt/Desktop/Computer_Architecture/Simple_Computer_Simulation_3/src/simple_computer_simulation/Status.java</file>
-            <file>file:/C:/Users/bhitt/Desktop/Computer_Architecture/Simple_Computer_Simulation_3/src/simple_computer_simulation/ProgramCounter.java</file>
-            <file>file:/C:/Users/bhitt/Desktop/Computer_Architecture/Simple_Computer_Simulation_3/src/simple_computer_simulation/ProgramLoader.java</file>
-            <file>file:/C:/Users/bhitt/Desktop/Computer_Architecture/Simple_Computer_Simulation_3/src/simple_computer_simulation/Simple_Computer_Simulation.java</file>
-            <file>file:/C:/Users/bhitt/Desktop/Computer_Architecture/Simple_Computer_Simulation_3/src/simple_computer_simulation/ISA.java</file>
-            <file>file:/C:/Users/bhitt/Desktop/Computer_Architecture/Simple_Computer_Simulation_3/src/simple_computer_simulation/InstructionRegister.java</file>
-        </group>
+        <group/>
     </open-files>
 </project-private>
